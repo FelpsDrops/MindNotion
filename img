@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Compressor de Imagens Pro</title>
+        <!-- Fontes e Bibliotecas -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/piexifjs/1.0.6/piexif.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+        <!-- Estilos -->
+        <style>/* =========================================
+            VARIÁVEIS CSS
+            ========================================= */:root { --primary: #8b5cf6; --primary-dark: #2563eb; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --background: #f8fafc; --card: #111827; --text: #FFFFFF; --text-secondary: #FFFFFF; --border: #e2e8f0; --accent: #8b5cf6; --accent-dark: #111827; } /* =========================================
+            RESET DE ESTILOS
+            ========================================= */* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; } /* =========================================
+            ESTILOS GERAIS
+            ========================================= */body { background: #111827; color: var(--text); min-height: 100vh; line-height: 1.5; } .container { max-width: 1200px; margin: 0 auto; padding: 2rem; } /* =========================================
+            HEADER
+            ========================================= */.header { text-align: center; margin-bottom: 3rem; animation: fadeIn 0.5s ease-out; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%); padding: 3rem; border-radius: 1.5rem; color: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                            0 10px 10px -5px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; } .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/></svg>') center/50% repeat; opacity: 0.1; } .header h1 { font-size: 3rem; margin-bottom: 1rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .header p { font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto; } /* =========================================
+            ESTATÍSTICAS
+            ========================================= */.stats { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; justify-content: center; } .stat-card { background: var(--card); padding: 1rem; border-radius: 1rem; flex: 1; min-width: 200px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 1px solid rgba(139, 92, 246, 0.1); } .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; } .stat-label { color: var(--text-secondary); font-size: 0.875rem; } .actions { display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 15px; } /* =========================================
+            FILTROS
+            ========================================= */.filters { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; justify-content: center; } .filter-btn { padding: 0.5rem 1rem; border: 2px solid var(--accent); border-radius: 2rem; color: var(--accent); background: transparent; cursor: pointer; transition: all 0.2s; font-weight: 500; } .filter-btn.active, .filter-btn:hover { background: var(--accent); color: white; } /* =========================================
+            AÇÕES EM LOTE
+            ========================================= */.batch-actions { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem; background: var(--card); border-radius: 1rem; margin: 2rem 0;  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) */ align-items: center; flex-wrap: wrap; } .batch-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; width: 100%; } .batch-row.size-controls { justify-content: center; } .actions-row { justify-content: center; gap: 1rem; } .input-group { display: flex; flex-direction: column; flex: 1; min-width: 150px; } .input-group label { margin-bottom: 0.5rem; font-weight: 600; color: var(--text); font-size: 0.8rem; } .batch-select, .size-input, .prefix-input { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 0.75rem; font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s; background: var(--background); outline: none; } .batch-select:focus, .size-input:focus, .prefix-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); } .batch-select::placeholder, .size-input::placeholder, .prefix-input::placeholder { color: var(--text-secondary); font-style: italic; } .separator { font-size: 1.5rem; font-weight: bold; color: var(--text-secondary); margin: 0 0.5rem; } .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; } .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); } .btn-outline:hover { background: var(--accent); color: white; } /* Responsividade para Batch Actions */@media (max-width: 768px) { .batch-actions {  padding: 1rem; }  .batch-row.size-controls {  flex-direction: column;  align-items: center; }  .separator {  display: none; }  .btn {  width: 100%; } } /* =========================================
+            ZONA DE DROPA
+            ========================================= */.drop-zone { border: 3px dashed var(--accent); border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; background: var(--card); cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; margin: 2rem 0; display: flex; gap: 1rem; align-items: center; justify-content: space-evenly; flex-direction: column; } .drop-zone::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--accent); opacity: 0; transition: opacity 0.3s; z-index: 0; } .drop-zone:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                            0 10px 10px -5px rgba(0, 0, 0, 0.04); border-color: var(--accent-dark); } .drop-zone.drag-over { border-color: var(--accent-dark); background: rgba(139, 92, 246, 0.1); } .drop-zone-icon { font-size: 3rem; color: var(--accent); margin-bottom: 1rem; } .drop-zone p { position: relative; z-index: 1; font-weight: 500; color: var(--accent); font-size: 1.25rem; } .drop-zone small { color: #ffffff; font-size: 0.75rem; } /* =========================================
+            GRADE DE IMAGENS
+            ========================================= */.images-grid, .pg-node-id-41, .pg-main-cs-691, .pg-file-cs-691 { border-color: 2px red; display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; margin-top: 2rem; } .image-card, .pg-node-id-42, .pg-main-cs-691, .pg-file-cs-691 { background: var(--card); border-radius: 1.5rem; overflow: hidden; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); transition: all 0.3s; animation: cardIn 0.4s ease-out; border: 2px solid rgba(255, 255, 255, 0.1); position: relative; } .image-card:hover,.image-card.pg-state-hover, .pg-node-id-43, .pg-main-cs-691, .pg-file-cs-691 { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                            0 10px 10px -5px rgba(0, 0, 0, 0.04); } .image-preview, .pg-node-id-44, .pg-main-cs-691, .pg-file-cs-691 { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #f1f5f9; } .image-preview img, .pg-node-id-45, .pg-main-cs-691, .pg-file-cs-691 { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; } .image-preview:hover img,.image-preview.pg-state-hover img, .pg-node-id-46, .pg-main-cs-691, .pg-file-cs-691 { transform: scale(1.05); } .image-meta, .pg-node-id-47, .pg-main-cs-691, .pg-file-cs-691 { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.8); color: white; padding: 1rem; font-size: 0.875rem; transform: translateY(100%); transition: transform 0.3s; backdrop-filter: blur(10px); } .image-preview:hover .image-meta,.image-preview.pg-state-hover .image-meta, .pg-node-id-48, .pg-main-cs-691, .pg-file-cs-691 { transform: translateY(0); } .image-controls, .pg-node-id-49, .pg-main-cs-691, .pg-file-cs-691 { padding: 1.5rem; } /* =========================================
+            CONTROLES DE IMAGEM - Nome e Formato
+            ========================================= *//* Input de Nome do Arquivo */.image-controls .filename-input, .pg-node-id-50, .pg-main-cs-691, .pg-file-cs-691 { padding: 0.5rem 1rem; border: 2px solid #ffffff; border-radius: 0.5rem; font-size: 0.75rem; margin-bottom: 10px; transition: border-color 0.3s, box-shadow 0.3s; background: #1f2937; color: white; outline: none; } .image-controls .filename-input:focus,.image-controls .filename-input.pg-state-focus, .pg-node-id-51, .pg-main-cs-691, .pg-file-cs-691 { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); } /* Select de Formato */.image-controls .format-select, .pg-node-id-52, .pg-main-cs-691, .pg-file-cs-691 { padding: 0.5rem 1rem; border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; font-size: 0.75rem; margin-bottom: 10px; transition: border-color 0.3s, box-shadow 0.3s; background: #1f2937; border: 2px solid #ffffff; color: white; outline: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="5"><polygon points="0,0 10,0 5,5" fill="%2364748B"/></svg>'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 10px 5px; } .image-controls .format-select:focus,.image-controls .format-select.pg-state-focus, .pg-node-id-53, .pg-main-cs-691, .pg-file-cs-691 { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); } /* Range Slider de Qualidade */.image-controls .range-slider input[type="range"], .pg-node-id-54, .pg-main-cs-691, .pg-file-cs-691 { width: 100%; margin: 0.5rem 0; } /* Labels de Qualidade */.image-controls .quality-labels, .pg-node-id-55, .pg-main-cs-691, .pg-file-cs-691 { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; } /* =========================================
+            Prefix Input
+            ========================================= */.prefix-input-group { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; } .prefix-input-group label { font-weight: 600; color: var(--text); font-size: 0.9rem; } .prefix-input-group input { padding: 0.5rem 1rem; border: 2px solid var(--border); border-radius: 0.5rem; font-size: 0.875rem; transition: border-color 0.3s, box-shadow 0.3s; background: var(--background); outline: none; width: 200px; } .prefix-input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); } /* /* =========================================
+            Savings Blocks
+            ========================================= *//* Container das Savings */.savings, .pg-node-id-60, .pg-main-cs-691, .pg-file-cs-691 { display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap; } /* Bloco de Tamanho Original */.savings .original-size, .pg-node-id-61, .pg-main-cs-691, .pg-file-cs-691 { background-color: #1f2937; font-size: 0.80rem; font-weight: 900;  /* Cor neutra */ padding: 0.75rem 1rem; border-radius: 0.5rem; flex: 1; min-width: 150px; border: 2px solid #ed5846; } .savings .original-size span:first-child, .pg-node-id-62, .pg-main-cs-691, .pg-file-cs-691 { font-weight: 900; } .savings .original-size span:last-child, .pg-node-id-63, .pg-main-cs-691, .pg-file-cs-691 { color: #ed5846; } /* Bloco de Tamanho Comprimido */.savings .compressed-size, .pg-node-id-64, .pg-main-cs-691, .pg-file-cs-691 { background-color: #1f2937; color: #22c55e; font-weight: 900; font-size: 0.80rem;  /* Cor neutra */ padding: 0.75rem 1rem; flex: 1; border-radius: 0.5rem; display: flex;  /* Para alinhar elementos lado a lado */ flex-direction: column;  /* Alterado para coluna */ gap: 0.5rem;  /* Espaçamento entre os elementos */ border: 2px solid #22c55e; } .savings .compressed-size .compressed-size-text, .pg-node-id-65, .pg-main-cs-691, .pg-file-cs-691 { display: flex; align-items: center; gap: 0.5rem; } .compressed-label, .pg-node-id-66, .pg-main-cs-691, .pg-file-cs-691 { font-weight: 900; color: var(--text);  /* Cor padrão */ } .compressed-value, .pg-node-id-67, .pg-main-cs-691, .pg-file-cs-691 { font-weight: bold; color: var(--success);  /* Texto verde */ } .savings .compressed-size span:first-child, .pg-node-id-68, .pg-main-cs-691, .pg-file-cs-691 { font-weight: 600; margin-bottom: 0; color: var(--text); } /* Badges de Status */.savings .savings-badge.success, .pg-node-id-69, .pg-main-cs-691, .pg-file-cs-691 { background-color: #22c55e; color: #1f2937; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; } .savings .savings-badge.warning, .pg-node-id-70, .pg-main-cs-691, .pg-file-cs-691 { background-color: var(--warning); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; } .savings .savings-badge.danger, .pg-node-id-71, .pg-main-cs-691, .pg-file-cs-691 { background-color: var(--danger); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; } @media (max-width: 768px) { .stats, .filters, .batch-actions, .pg-node-id-72, .pg-main-cs-691, .pg-file-cs-691 {  flex-direction: column;  gap: 1.5rem; }  .stat-card, .image-card, .pg-node-id-73, .pg-main-cs-691, .pg-file-cs-691 {  min-width: 100%;   /* Faz os cards ocuparem toda a largura */ } } /* =========================================
+            Modal de Recorte
+            ========================================= */.modal, .pg-node-id-74, .pg-main-cs-691, .pg-file-cs-691 { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; backdrop-filter: blur(5px); } .modal.active, .pg-node-id-75, .pg-main-cs-691, .pg-file-cs-691 { opacity: 1; visibility: visible; } .modal-content, .pg-node-id-76, .pg-main-cs-691, .pg-file-cs-691 { background: var(--card); padding: 2rem; border-radius: 1rem; max-width: 50vw; max-height: 100vh; overflow: auto; position: relative; transform: scale(0.9); transition: transform 0.3s; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); } .modal.active .modal-content, .pg-node-id-77, .pg-main-cs-691, .pg-file-cs-691 { transform: scale(1); } .modal-close, .pg-node-id-78, .pg-main-cs-691, .pg-file-cs-691 { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; padding: 0.5rem; transition: all 0.2s; } .modal-close:hover,.modal-close.pg-state-hover, .pg-node-id-79, .pg-main-cs-691, .pg-file-cs-691 { color: var(--text); transform: rotate(90deg); } /* =========================================
+            Ações da Imagem
+            ========================================= */.image-tools, .pg-node-id-80, .pg-main-cs-691, .pg-file-cs-691 { display: flex; gap: 0.5rem; position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0; transition: opacity 0.3s; } .image-preview:hover .image-tools,.image-preview.pg-state-hover .image-tools, .pg-node-id-81, .pg-main-cs-691, .pg-file-cs-691 { opacity: 1; } .tool-btn, .pg-node-id-82, .pg-main-cs-691, .pg-file-cs-691 { width: 36px; height: 36px; border-radius: 50%; background: rgba(0, 0, 0, 0.8); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; backdrop-filter: blur(10px); } .tool-btn:hover,.tool-btn.pg-state-hover, .pg-node-id-83, .pg-main-cs-691, .pg-file-cs-691 { background: var(--accent); transform: scale(1.1); } /* =========================================
+            Barra de Progresso
+            ========================================= */.progress-bar, .pg-node-id-84, .pg-main-cs-691, .pg-file-cs-691 { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 1rem 0; position: relative; } .progress-bar-fill, .pg-node-id-85, .pg-main-cs-691, .pg-file-cs-691 { height: 100%; background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%); transition: width 0.3s ease; position: relative; width: 0%; } .progress-bar-fill::after, .pg-node-id-86, .pg-main-cs-691, .pg-file-cs-691 { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 100px; background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%); animation: shimmer 1.5s infinite; } /* =========================================
+            Animações
+            ========================================= */@keyframes shimmer { 0% {  transform: translateX(-100%); }  100% {  transform: translateX(100%); } } @keyframes cardIn { from {  opacity: 0;  transform: scale(0.95) translateY(10px); }  to {  opacity: 1;  transform: scale(1) translateY(0); } } @keyframes fadeIn { from {  opacity: 0; }  to {  opacity: 1; } } /* =========================================
+            Outros Componentes
+            ========================================= *//* Crop Presets */.crop-presets, .pg-node-id-87, .pg-main-cs-691, .pg-file-cs-691 { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: center; } .crop-preset-btn, .pg-node-id-88, .pg-main-cs-691, .pg-file-cs-691 { padding: 0.5rem 1rem; border: 2px solid var(--accent); border-radius: 0.5rem; background: transparent; color: var(--accent); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; } .crop-preset-btn.active, .crop-preset-btn:hover,.crop-preset-btn.pg-state-hover, .pg-node-id-89, .pg-main-cs-691, .pg-file-cs-691 { background: var(--accent); color: white; } /* Range Slider */.range-slider, .pg-node-id-90, .pg-main-cs-691, .pg-file-cs-691 { position: relative; width: 100%; height: 24px; display: flex; align-items: center; } input[type="range"], .pg-node-id-91, .pg-main-cs-691, .pg-file-cs-691 { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; padding: 0; margin: 0; } input[type="range"]::-webkit-slider-thumb, .pg-node-id-92, .pg-main-cs-691, .pg-file-cs-691 { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: all 0.2s ease-in-out; border: 2px solid white; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); } input[type="range"]::-webkit-slider-thumb:hover,input[type="range"]::-webkit-slider-thumb.pg-state-hover, .pg-node-id-93, .pg-main-cs-691, .pg-file-cs-691 { background: var(--accent-dark); transform: scale(1.1); } /* Metadata Toggle */.metadata-toggle, .pg-node-id-94, .pg-main-cs-691, .pg-file-cs-691 { display: flex; align-items: center; gap: 0.75rem; font-size: 0.80rem; margin-top: 1rem; padding: 1rem; background: rgba(139, 92, 246, 0.05); border-radius: 0.75rem; border: 1px solid rgba(139, 92, 246, 0.1); } .toggle-switch, .pg-node-id-95, .pg-main-cs-691, .pg-file-cs-691 { position: relative; width: 48px; height: 24px; } .toggle-switch input, .pg-node-id-96, .pg-main-cs-691, .pg-file-cs-691 { opacity: 0; width: 0; height: 0; } .toggle-slider, .pg-node-id-97, .pg-main-cs-691, .pg-file-cs-691 { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 24px; } .toggle-slider:before, .pg-node-id-98, .pg-main-cs-691, .pg-file-cs-691 { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } input:checked + .toggle-slider, .pg-node-id-99, .pg-main-cs-691, .pg-file-cs-691 { background-color: var(--accent); } input:checked + .toggle-slider:before, .pg-node-id-100, .pg-main-cs-691, .pg-file-cs-691 { transform: translateX(24px); } /* Tooltip */.tooltip, .pg-node-id-101, .pg-main-cs-691, .pg-file-cs-691 { position: relative; display: inline-block; } .tooltip .tooltip-text, .pg-node-id-102, .pg-main-cs-691, .pg-file-cs-691 { visibility: hidden; background: var(--text); color: white; text-align: center; padding: 0.5rem 1rem; border-radius: 0.5rem; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: all 0.3s; font-size: 0.75rem; white-space: nowrap; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } .tooltip .tooltip-text::after, .pg-node-id-103, .pg-main-cs-691, .pg-file-cs-691 { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--text) transparent transparent transparent; } .tooltip:hover .tooltip-text,.tooltip.pg-state-hover .tooltip-text, .pg-node-id-104, .pg-main-cs-691, .pg-file-cs-691 { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-5px); } /*========================================= *//* Crop Presets */.crop-presets { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: center; } .crop-preset-btn { padding: 0.5rem 1rem; border: 2px solid var(--accent); border-radius: 0.5rem; background: transparent; color: var(--accent); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; } .crop-preset-btn.active, .crop-preset-btn:hover { background: var(--accent); color: white; } /* Range Slider */.range-slider { position: relative; width: 100%; height: 24px; display: flex; align-items: center; } input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; padding: 0; margin: 0; } input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: all 0.2s ease-in-out; border: 2px solid white; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); } input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent-dark); transform: scale(1.1); } /* Metadata Toggle */.metadata-toggle { display: flex; align-items: center; gap: 0.75rem; font-size: 0.80rem; margin-top: 1rem; padding: 1rem; background: rgba(139, 92, 246, 0.05); border-radius: 0.75rem; border: 1px solid rgba(139, 92, 246, 0.1); } .toggle-switch { position: relative; width: 48px; height: 24px; } .toggle-switch input { opacity: 0; width: 0; height: 0; } .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 24px; } .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } input:checked + .toggle-slider { background-color: var(--accent); } input:checked + .toggle-slider:before { transform: translateX(24px); } /* Tooltip */.tooltip { position: relative; display: inline-block; } .tooltip .tooltip-text { visibility: hidden; background: var(--text); color: white; text-align: center; padding: 0.5rem 1rem; border-radius: 0.5rem; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: all 0.3s; font-size: 0.75rem; white-space: nowrap; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } .tooltip .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--text) transparent transparent transparent; } .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-5px); } /* =========================================
+            BOTÕES GLOBAIS
+            ========================================= */.global-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 3rem; padding-top: 2rem;  /* border-top: 2px solid rgba(139, 92, 246, 0.1) */ flex-wrap: wrap; } .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2); } .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(139, 92, 246, 0.3); } .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); } .btn-danger:hover { filter: brightness(110%); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(239, 68, 68, 0.3); } /* =========================================
+            RESPONSIVIDADE GERAL
+            ========================================= */@media (max-width: 768px) { .container {  padding: 1rem; }  .header {  padding: 2rem 1rem; }  .header h1 {  font-size: 2rem; }  .images-grid {  grid-template-columns: 2fr; }  .batch-actions {  padding: 1rem; }  .batch-row.size-controls {  flex-direction: column;  align-items: center; }  .separator {  display: none; }  .btn {  width: 100%; } } /* =========================================
+            MODAL DE RECORTE
+            ========================================= */.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; backdrop-filter: blur(5px); } .modal.active { opacity: 1; visibility: visible; } .modal-content { background: var(--card); padding: 2rem; border-radius: 1rem; max-width: 50vw; max-height: 100vh; overflow: auto; position: relative; transform: scale(0.9); transition: transform 0.3s; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); } .modal.active .modal-content { transform: scale(1); } .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; padding: 0.5rem; transition: all 0.2s; } .modal-close:hover { color: var(--text); transform: rotate(90deg); } /* =========================================
+            AÇÕES DA IMAGEM
+            ========================================= */.image-tools { display: flex; gap: 0.5rem; position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0; transition: opacity 0.3s; } .image-preview:hover .image-tools { opacity: 1; } .tool-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(0, 0, 0, 0.8); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; backdrop-filter: blur(10px); } .tool-btn:hover { background: var(--accent); transform: scale(1.1); } /* =========================================
+            Barra de Progresso
+            ========================================= */.progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 1rem 0; position: relative; } .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%); transition: width 0.3s ease; position: relative; width: 0%; } .progress-bar-fill::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 100px; background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%); animation: shimmer 1.5s infinite; } /* =========================================
+            Animações
+            ========================================= */@keyframes shimmer { 0% {  transform: translateX(-100%); }  100% {  transform: translateX(100%); } } @keyframes cardIn { from {  opacity: 0;  transform: scale(0.95) translateY(10px); }  to {  opacity: 1;  transform: scale(1) translateY(0); } } @keyframes fadeIn { from {  opacity: 0; }  to {  opacity: 1; } } /* =========================================
+            Outros Componentes
+            ========================================= *//* Crop Presets */.crop-presets { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: center; } .crop-preset-btn { padding: 0.5rem 1rem; border: 2px solid var(--accent); border-radius: 0.5rem; background: transparent; color: var(--accent); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; } .crop-preset-btn.active, .crop-preset-btn:hover { background: var(--accent); color: white; } /* Range Slider */.range-slider { position: relative; width: 100%; height: 24px; display: flex; align-items: center; } input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; padding: 0; margin: 0; } input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: all 0.2s ease-in-out; border: 2px solid white; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); } input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent-dark); transform: scale(1.1); } /* Metadata Toggle */.metadata-toggle { display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem; padding: 1rem; background: rgba(139, 92, 246, 0.05); border-radius: 0.75rem; border: 1px solid rgba(139, 92, 246, 0.1); } .toggle-switch { position: relative; width: 48px; height: 24px; } .toggle-switch input { opacity: 0; width: 0; height: 0; } .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 24px; } .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } input:checked + .toggle-slider { background-color: var(--accent); } input:checked + .toggle-slider:before { transform: translateX(24px); } /* Tooltip */.tooltip { position: relative; display: inline-block; } .tooltip .tooltip-text { visibility: hidden; background: var(--text); color: white; text-align: center; padding: 0.5rem 1rem; border-radius: 0.5rem; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: all 0.3s; font-size: 0.75rem; white-space: nowrap; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } .tooltip .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--text) transparent transparent transparent; } .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-5px); } /* =========================================
+            BOTÕES GLOBAIS
+            ========================================= */.global-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 3rem; padding-top: 2rem;  /* border-top: 2px solid rgba(139, 92, 246, 0.1) */ flex-wrap: wrap; } .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2); } .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(139, 92, 246, 0.3); } .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); } .btn-danger:hover { filter: brightness(110%); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(239, 68, 68, 0.3); } /* =========================================
+            RESPONSIVIDADE GERAL
+            ========================================= */@media (max-width: 768px) { .container {  padding: 1rem; }  .header {  padding: 2rem 1rem; }  .header h1 {  font-size: 2rem; }  .images-grid {  grid-template-columns: 2fr; }  .batch-actions {  padding: 1rem; }  .batch-row.size-controls {  flex-direction: column;  align-items: center; }  .separator {  display: none; }  .btn {  width: 100%; } } /* =========================================
+            Modal de Recorte
+            ========================================= */.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; backdrop-filter: blur(5px); } .modal.active { opacity: 1; visibility: visible; } .modal-content { background: var(--card); padding: 2rem; border-radius: 1rem; max-width: 600px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); } .modal.active .modal-content { transform: scale(1); } .modal-close { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; } .modal-close:hover { color: var(--text); transform: rotate(90deg); } /* =========================================
+            Ações da Imagem
+            ========================================= */.image-tools { display: flex; gap: 0.5rem; position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0; transition: opacity 0.3s; } .image-preview:hover .image-tools { opacity: 1; } .tool-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(0, 0, 0, 0.8); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; backdrop-filter: blur(10px); } .tool-btn:hover { background: var(--accent); transform: scale(1.1); } /* =========================================
+            Barra de Progresso
+            ========================================= */.progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 1rem 0; position: relative; } .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%); transition: width 0.3s ease; position: relative; width: 0%; } .progress-bar-fill::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 100px; background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%); animation: shimmer 1.5s infinite; } /* =========================================
+            Animações
+            ========================================= */@keyframes shimmer { 0% {  transform: translateX(-100%); }  100% {  transform: translateX(100%); } } @keyframes cardIn { from {  opacity: 0;  transform: scale(0.95) translateY(10px); }  to {  opacity: 1;  transform: scale(1) translateY(0); } } @keyframes fadeIn { from {  opacity: 0; }  to {  opacity: 1; } } /* =========================================
+            Outros Componentes
+            ========================================= *//* Crop Presets */.crop-presets { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: center; } .crop-preset-btn { padding: 0.5rem 1rem; border: 2px solid var(--accent); border-radius: 2rem; background: transparent; color: var(--accent); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; } .crop-preset-btn.active, .crop-preset-btn:hover { background: var(--accent); color: white; } /* Range Slider */.range-slider { position: relative; width: 100%; height: 24px; display: flex; align-items: center; } input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; padding: 0; margin: 0; } input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: all 0.2s ease-in-out; border: 2px solid white; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); } input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent-dark); transform: scale(1.1); } /* Metadata Toggle */.metadata-toggle { display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem; padding: 1rem; background: rgba(139, 92, 246, 0.05); border-radius: 0.75rem; border: 1px solid rgba(139, 92, 246, 0.1); } .toggle-switch { position: relative; width: 48px; height: 24px; } .toggle-switch input { opacity: 0; width: 0; height: 0; } .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 24px; } .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } input:checked + .toggle-slider { background-color: var(--accent); } input:checked + .toggle-slider:before { transform: translateX(24px); } /* Tooltip */.tooltip { position: relative; display: inline-block; } .tooltip .tooltip-text { visibility: hidden; background: var(--text); color: white; text-align: center; padding: 0.5rem 1rem; border-radius: 0.5rem; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: all 0.3s; font-size: 0.75rem; white-space: nowrap; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } .tooltip .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--text) transparent transparent transparent; } .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-5px); } /* =========================================
+            BOTÕES GLOBAIS
+            ========================================= */.global-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 3rem; padding-top: 2rem;  /* border-top: 2px solid rgba(139, 92, 246, 0.1) */ flex-wrap: wrap; } .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2); } .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(139, 92, 246, 0.3); } .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); } .btn-danger:hover { filter: brightness(110%); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(239, 68, 68, 0.3); } .toast {
+    background: #22c55e; /* Cor de sucesso */
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    animation: slideIn 0.5s ease, fadeOut 4s ease 3s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+ /* =========================================
+            RESPONSIVIDADE GERAL
+            ========================================= */@media (max-width: 768px) { .container {  padding: 1rem; }  .header {  padding: 2rem 1rem; }  .header h1 {  font-size: 2rem; }  .images-grid {  grid-template-columns: 2fr; }  .batch-actions {  padding: 1rem; }  .batch-row.size-controls {  flex-direction: column;  align-items: center; }  .separator {  display: none; }  .btn {  width: 100%; } }</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins&display=swap">
+    </head>
+    <body>
+        <div class="container">
+            <section class="batch-drop-section" style="text-align: center;">
+                <section class="batch-drop-section" style="display: inline-flex; flex-wrap: nowrap; gap: 20px; align-items: center; margin-top: 0; margin-bottom: 0; flex-direction: row; align-content: space-around; height: auto; width: auto;"> 
+                    <div class="batch-actions container" style="flex: 1; height: 135px; display: flex; flex-direction: column; border: 2px solid #8b5cf6; background-color: #1f2937; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); padding: 20px; width: 650px; text-align: center; align-items: center; justify-content: center; min-height: 135px; max-height: 135px;">
+                        <div style="display: flex; align-items: flex-end;
+
+/* gap: 10px */
+width: 100%; padding: 0px; background-color: #1f2937; border-radius: 12px;">
+                            <div style="flex: 1; min-width: 140px; margin-left: -10px;">
+                                <label for="outputHeight" style="text-transform: uppercase; font-weight: 700; font-size: 14px; color: #f3f4f6; margin-bottom: 8px; display: block; font-family: 'Poppins', sans-serif;">Altura</label>
+                                <input type="number" id="outputHeight" placeholder="Ex: 600" class="size-input input" style="height: 45px; width: 80%; font-size: 15px; padding: 10px 15px; border: 1px solid #374151; border-radius: 8px; background-color: #374151; color: #f9fafb; font-family: 'Poppins', sans-serif;">
+                            </div>
+                            <div style="flex: 1; min-width: 140px; margin-left: -10px;">
+                                <label for="outputWidth" style="text-transform: uppercase; font-weight: 700; font-size: 14px; color: #f3f4f6; margin-bottom: 8px; display: block; font-family: 'Poppins', sans-serif;">Largura</label>
+                                <input type="number" id="outputWidth" placeholder="Ex: 800" class="size-input input" style="height: 45px; width: 80%; font-size: 15px; padding: 10px 15px; border: 1px solid #374151; border-radius: 8px; background-color: #374151; color: #f9fafb; font-family: 'Poppins', sans-serif;">
+                            </div>
+                            <div style="flex: 1; min-width: 140px; margin-left: -10px;">
+                                <label for="outputDepth" style="text-transform: uppercase; font-weight: 700; font-size: 14px; color: #f3f4f6; margin-bottom: 8px; display: block; font-family: 'Poppins', sans-serif;">Prefixo</label>
+                                <input type="text" id="namingPrefix" placeholder="Ex: ft" class="prefix-input input" style="height: 45px; font-size: 15px; padding: 10px 15px; border: 1px solid #374151; border-radius: 8px; background-color: #374151; color: #f9fafb; width: 80%; font-family: 'Poppins', sans-serif;">
+                            </div>
+                            <button id="applyDimensions" class="btn btn-primary" style="height: 45px; font-size: 15px; padding: 10px 15px; border-radius: 8px; background-color: #8b5cf6; color: white; width: 25%; font-family: 'Poppins', sans-serif; font-weight: 700;">Aplicar</button>
+                        </div>
+                        <div class="batch-row outer" style="margin-top: 5px; margin-bottom: -5px; width: 250px; max-width: 250px; display: inline-grid; grid-area: 1 / 1 / 2 / 2; text-align: center; font-size: 0;"></div>
+                        <div class="batch-row size-controls outer" style="width: 250px; max-width: 250px; display: inline-grid; grid-area: 1 / 2 / 2 / 3;">
+                            <div class="input-group inner-cont" style="margin-top: 5px; text-align: left;"></div>
+                        </div>
+                    </div>
+                    <div class="stats" style="margin-bottom: 0; gap: 0; margin-top: 0; grid-area: 2 / 1 / 3 / 4; display: flex; justify-content: space-between; height: 130px; min-height: 130px; max-height: 130px; width: auto;">
+                        <div class="stat-card" style="border: 2px solid #0095ff; border-radius: 12px; padding: 0; background-color: #1f2937; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1); width: 35%; text-align: center; margin-bottom: 10px; min-width: 30%; max-width: 35%; height: 130px; min-height: 130px; max-height: 130px; margin-right: 10px; margin-left: -10px;">
+                            <div style="font-size: 24px; color: #0095ff; margin-top: 15px;">
+                                <i class="fas fa-images"></i>
+                            </div>
+                            <div class="stat-value" id="totalImages" style="font-size: 18px; color: #0095ff; margin-bottom: 0;">0</div>
+                            <div class="stat-label" style="font-weight: 400; font-size: 14px; color: #d1d5db; line-height: 15px; font-family: 'Poppins', sans-serif;">Imagens Processadas</div>
+                        </div>
+                        <div class="stat-card" style="border: 2px solid #dbc520; border-radius: 12px; padding: 0; background-color: #1f2937; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); width: 35%; text-align: center; margin-bottom: 10px; min-width: 30%; max-width: 35%; height: 130px; min-height: 130px; max-height: 130px; gap: 0; margin-right: 10px;">
+                            <div style="font-size: 24px; color: #dbc520; margin-top: 15px;">
+                                <i class="fas fa-save"></i>
+                            </div>
+                            <div class="stat-value" id="totalSaved" style="font-size: 18px; color: #dbc520; margin-bottom: 0;">0 MB</div>
+                            <div class="stat-label" style="font-weight: 400; font-size: 14px; color: #e5e7eb; line-height: 15px; font-family: 'Poppins', sans-serif;">Espaço Economizado</div>
+                        </div>
+                        <div class="stat-card" style="align-items: center; border: 2px solid #4ade80; border-radius: 12px; padding: 0; background-color: #1f2937; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); width: 35%; text-align: center; min-width: 30%; max-width: 35%; height: 130px; min-height: 130px; max-height: 130px;">
+                            <div style="font-size: 24px; color: #22c55e; margin-top: 15px;">
+                                <i class="fas fa-compress-arrows-alt"></i>
+                            </div>
+                            <div class="stat-value" id="averageCompression" style="font-size: 18px; color: #22c55e; margin-bottom: 0;">0%</div>
+                            <div class="stat-label" style="font-weight: 400; font-size: 14px; color: #e5e7eb; line-height: 15px; font-family: 'Poppins', sans-serif;">Compressão 
+                                <p>Média</p>
+                            </div>
+                        </div>
+                    </div>                     
+                    <script>
+    document.getElementById('dropZone').addEventListener('click', function() {
+        document.getElementById('fileInput').click();
+    });
+</script>                     
+                </section>
+                <div class="drop-zone" id="dropZone" style="flex: 1; text-align: center; min-height: 200px; width: Auto; max-height: 200px; height: 200px; cursor: pointer; padding-top: 35px; margin-top: 0; border: 3.5px dashed #9067f6; background-color: #1f2937; color: #ffffff; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);">
+                    <div class="drop-zone-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <p style="margin-top: -30px; color: #ffffff; font-family: 'Poppins', sans-serif;">Arraste e solte imagens aqui ou clique para selecionar</p>
+                    <input type="file" id="fileInput" multiple="" accept="image/*" style="display: none;">
+                </div>
+            </section>
+            <div class="global-actions">
+                <button class="btn btn-primary" id="downloadAllBtn" style="display: none">
+                    <i class="fas fa-download"></i> Baixar Todas as Imagens (ZIP)
+                </button>
+                <button class="btn btn-danger" id="clearAllBtn" style="display: none">
+                    <i class="fas fa-trash-alt"></i> Limpar Todas
+                </button>
+            </div>
+            <div class="images-grid" id="imagesGrid"></div>
+        </div>
+        <!-- Modal de Recorte -->
+        <div class="modal" id="cropModal">
+            <div class="modal-content">
+                <button class="modal-close">×</button>
+                <h2>Recortar Imagem</h2>
+                <div class="crop-presets">
+                    <button class="crop-preset-btn active" data-ratio="free">Livre</button>
+                    <button class="crop-preset-btn" data-ratio="1">1:1</button>
+                    <button class="crop-preset-btn" data-ratio="0.75">3:4</button>
+                    <button class="crop-preset-btn" data-ratio="1.33">4:3</button>
+                    <button class="crop-preset-btn" data-ratio="0.5625">16:9</button>
+                </div>
+                <div class="cropper-container">
+                    <img id="cropImage" src="" alt="Imagem para recorte">
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" id="applyCrop">Aplicar</button>
+                    <button class="btn btn-outline" id="cancelCrop">Cancelar</button>
+                </div>
+            </div>
+        </div>
+        <div class="cropper-container" style="text-align: center;">
+</div>
+    </div>
+</div>
+<div class="body">
+    <svg class="svg" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <path></path>
+    </svg>
+    <svg class="svg" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <path></path>
+    </svg>
+</div>
+<div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+<div class="body">
+</div>
+<!-- Scripts JavaScript -->
+<script>
+        class ImageCompressor {
+            constructor() {
+                this.images = new Map();
+                this.stats = {
+                    totalImages: 0,
+                    totalSaved: 0,
+                    totalCompression: 0
+                };
+                this.namingPrefix = '';
+                this.namingCount = 1;
+                this.setupEventListeners();
+                this.cropper = null;
+                this.currentCropId = null;
+                this.outputSize = {
+                    width: null,
+                    height: null
+                };
+            }
+
+            setupEventListeners() {
+                const dropZone = document.getElementById('dropZone');
+                const fileInput = document.getElementById('fileInput');
+                const downloadAllBtn = document.getElementById('downloadAllBtn');
+                const clearAllBtn = document.getElementById('clearAllBtn');
+                
+
+            
+                const filterBtns = document.querySelectorAll('.filter-btn');
+                const cropModal = document.getElementById('cropModal');
+                const applyCropBtn = document.getElementById('applyCrop');
+                const cancelCropBtn = document.getElementById('cancelCrop');
+                const namingPrefixInput = document.getElementById('namingPrefix');
+
+
+
+                // Drop zone events
+                dropZone.addEventListener('click', () => fileInput.click());
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('drag-over');
+                });
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+
+                // File input event
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files);
+                    fileInput.value = ''; // Reset file input
+                });
+
+                // Naming prefix input event
+                namingPrefixInput.addEventListener('input', (e) => {
+                    this.namingPrefix = e.target.value.trim();
+                    this.namingCount = 1; // Reset count when prefix changes
+                });
+
+                // Global buttons events
+                downloadAllBtn.addEventListener('click', () => this.downloadAllAsZip());
+                clearAllBtn.addEventListener('click', () => this.clearAll());
+
+                
+                // Filter buttons events
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.filterImages(btn.dataset.filter);
+                    });
+                });
+
+                // Crop modal events
+                cropModal.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        this.closeCropModal();
+                    }
+                });
+
+                // Event listener para o botão de fechar o modal
+                const modalCloseBtn = cropModal.querySelector('.modal-close');
+                modalCloseBtn.addEventListener('click', () => {
+                    this.closeCropModal();
+                });
+
+                applyCropBtn.addEventListener('click', () => {
+                    this.applyCrop();
+                });
+
+                cancelCropBtn.addEventListener('click', () => {
+                    this.closeCropModal();
+                });
+
+                // Crop preset buttons
+                document.querySelectorAll('.crop-preset-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.crop-preset-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        const ratio = btn.dataset.ratio === 'free' ? NaN : parseFloat(btn.dataset.ratio);
+                        if (this.cropper) {
+                            this.cropper.setAspectRatio(ratio);
+                        }
+                    });
+                });
+
+                // Validação de inputs de tamanho
+                document.querySelectorAll('.size-input').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const value = parseInt(e.target.value, 10);
+                        if (isNaN(value) || value <= 0) {
+                            e.target.classList.add('error');
+                            // Adicionar mensagem de erro
+                            let errorMsg = e.target.parentElement.querySelector('.error-message');
+                            if (!errorMsg) {
+                                errorMsg = document.createElement('span');
+                                errorMsg.className = 'error-message';
+                                errorMsg.style.color = 'var(--danger)';
+                                errorMsg.style.fontSize = '0.75rem';
+                                errorMsg.textContent = 'Por favor, insira um número válido.';
+                                e.target.parentElement.appendChild(errorMsg);
+                            }
+                        } else {
+                            e.target.classList.remove('error');
+                            const errorMsg = e.target.parentElement.querySelector('.error-message');
+                            if (errorMsg) errorMsg.remove();
+                        }
+                    });
+                });
+
+                // Inputs de tamanho de saída
+                outputWidth.addEventListener('input', (e) => {
+    this.outputSize.width = e.target.value ? parseInt(e.target.value) : null;
+});
+
+outputHeight.addEventListener('input', (e) => {
+    this.outputSize.height = e.target.value ? parseInt(e.target.value) : null;
+});
+
+
+                outputWidth.addEventListener('input', (e) => {
+                    this.outputSize.width = e.target.value ? parseInt(e.target.value) : null;
+                });
+
+                outputHeight.addEventListener('input', (e) => {
+                    this.outputSize.height = e.target.value ? parseInt(e.target.value) : null;
+                });
+            }
+
+            handleFiles(files) {
+                const validFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+                for (const file of validFiles) {
+                    const id = this.generateId();
+                    const preview = URL.createObjectURL(file);
+                    const name = this.namingPrefix ? `${this.namingPrefix}${this.namingCount++}` : file.name.replace(/\.[^/.]+$/, "");
+                    this.images.set(id, {
+                        id,
+                        file,
+                        preview,
+                        name: name,
+                        format: 'webp',
+                        quality: 100,
+                        removeMetadata: true,
+                        selected: false,
+                        originalSize: file.size,
+                        compressedSize: null
+                    });
+                    this.createImageCard(this.images.get(id));
+                    this.compressImage(id);
+                    this.updateGlobalButtons();
+                }
+            }
+
+            generateId() {
+                return '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            createImageCard(imageData) {
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.dataset.id = imageData.id;
+                card.innerHTML = `
+                    <div class="image-preview">
+                        <img src="${imageData.preview}" alt="${imageData.name}">
+                        <div class="image-tools">
+                            <button class="tool-btn crop-btn" title="Recortar"><i class="fas fa-cut"></i></button>
+                        </div>
+                        <div class="image-meta">
+                            <div>Dimensões: <span class="dimensions">Carregando...</span></div>
+                            <div>Tipo: ${imageData.file.type}</div>
+                        </div>
+                    </div>
+                   <div class="image-controls">
+                        <div class="input-group">
+                            <label for="filename-${imageData.id}">Nome do arquivo</label>
+                            <input type="text" id="filename-${imageData.id}" value="${imageData.name}" data-id="${imageData.id}" class="filename-input">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group flex-1">
+                                <label for="format-${imageData.id}">Formato</label>
+                                <select id="format-${imageData.id}" data-id="${imageData.id}" class="format-select">
+                                    <option value="webp" ${imageData.format === 'webp' ? 'selected' : ''}>WebP</option>
+                                    <option value="jpeg" ${imageData.format === 'jpeg' ? 'selected' : ''}>JPEG</option>
+                                    <option value="png" ${imageData.format === 'png' ? 'selected' : ''}>PNG</option>
+                                </select>
+                            </div>
+                            <div class="input-group flex-1">
+                                <label for="quality-${imageData.id}">Qualidade: <span class="quality-value">${imageData.quality}%</span></label>
+                                <div class="range-slider">
+                                    <input type="range" id="quality-${imageData.id}" min="1" max="100" value="${imageData.quality}" data-id="${imageData.id}" class="quality-input">
+                                </div>
+                                <div class="quality-labels">
+                                    <span>Menor</span>
+                                    <span>Maior</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metadata-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" ${imageData.removeMetadata ? 'checked' : ''} data-id="${imageData.id}" class="metadata-input">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>Limpar Meta Dados</span>
+                            <div class="tooltip">
+                                <span></span>
+                               
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="savings">
+                            <div class="original-size">
+                                <span>Original:</span> <span>${this.formatBytes(imageData.originalSize)}</span>
+                            </div>
+                            <div class="compressed-size">
+                                <div class="compressed-size-text">
+                                    <span>Reduzido:</span> <span>${this.formatBytes(imageData.compressedSize || 0)}</span>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn btn-primary" onclick="imageCompressor.downloadImage('${imageData.id}')">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                            <button class="btn btn-danger" onclick="imageCompressor.removeImage('${imageData.id}')">
+                                <i class="fas fa-trash-alt"></i> Apagar
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('imagesGrid').appendChild(card);
+
+                // Carregar e exibir dimensões da imagem
+                const img = new Image();
+                img.onload = () => {
+                    card.querySelector('.dimensions').textContent = `${img.width}x${img.height}px`;
+                };
+                img.src = imageData.preview;
+
+                this.setupCardEventListeners(card, imageData);
+            }
+
+            setupCardEventListeners(card, imageData) {
+                // Input de nome de arquivo
+                card.querySelector('.filename-input').addEventListener('input', (e) => {
+                    const imageData = this.images.get(e.target.dataset.id);
+                    imageData.name = e.target.value;
+                });
+
+                // Seleção de formato
+                card.querySelector('.format-select').addEventListener('change', (e) => {
+                    const imageData = this.images.get(e.target.dataset.id);
+                    imageData.format = e.target.value;
+                    this.compressImage(e.target.dataset.id);
+                });
+
+                // Input de qualidade
+                card.querySelector('.quality-input').addEventListener('input', (e) => {
+                    const quality = e.target.value;
+                    const imageData = this.images.get(e.target.dataset.id);
+                    imageData.quality = quality;
+                    card.querySelector('.quality-value').textContent = quality + '%';
+                    this.compressImage(e.target.dataset.id);
+                });
+
+                // Toggle de metadados
+                card.querySelector('.metadata-input').addEventListener('change', (e) => {
+                    const imageData = this.images.get(e.target.dataset.id);
+                    imageData.removeMetadata = e.target.checked;
+                    this.compressImage(e.target.dataset.id);
+                });
+
+                // Botão de recorte
+                card.querySelector('.crop-btn').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Evitar seleção da imagem ao clicar no botão
+                    this.openCropModal(imageData.id);
+                });
+
+                // Seleção da imagem ao clicar no card (exceto em botões, inputs e selects)
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('button, input, select')) {
+                        this.toggleImageSelection(imageData.id);
+                    }
+                });
+            }
+
+            async compressImage(id) {
+                const imageData = this.images.get(id);
+                const card = document.querySelector(`[data-id="${id}"]`);
+                const progressBar = card.querySelector('.progress-bar-fill');
+
+                try {
+                    progressBar.style.width = '50%';
+
+                    let processedBlob = imageData.file;
+                    
+                    if (imageData.removeMetadata) {
+                        processedBlob = await this.removeMetadata(processedBlob);
+                    }
+
+
+                    // Opções de compressão
+                    const options = {
+                        maxSizeMB: 10,
+                        useWebWorker: true,
+                        fileType: `image/${imageData.format}`,
+                        initialQuality: imageData.quality / 100
+                    };
+
+                    if (this.outputSize.width && this.outputSize.height) {
+                        options.maxWidthOrHeight = Math.max(this.outputSize.width, this.outputSize.height);
+                        // Redimensionamento será feito após a compressão
+                    }
+
+                    const compressedBlob = await imageCompression(processedBlob, options);
+
+                    // Redimensionar para dimensões exatas se especificado
+                    if (this.outputSize.width && this.outputSize.height) {
+                        const resizedBlob = await this.resizeImage(compressedBlob, this.outputSize.width, this.outputSize.height);
+                        imageData.compressedBlob = resizedBlob;
+                        imageData.compressedSize = resizedBlob.size;
+                    } else {
+                        imageData.compressedBlob = compressedBlob;
+                        imageData.compressedSize = compressedBlob.size;
+                    }
+
+                    progressBar.style.width = '100%';
+
+                    const savings = imageData.originalSize ? ((imageData.originalSize - imageData.compressedSize) / imageData.originalSize * 100).toFixed(1) : 0;
+                    let savingsClass = 'danger';
+                    if (savings > 50) {
+                        savingsClass = 'success';
+                    } else if (savings > 25) {
+                        savingsClass = 'warning';
+                    }
+                    
+                  card.querySelector('.compressed-size').innerHTML = `
+    <div class="compressed-size-text" style="display: inline;">
+        <span>Reduzido:</span>
+        <span style="margin-left: 0px;">${this.formatBytes(imageData.compressedSize)}</span>
+        <span class="savings-badge ${savingsClass}" style="margin-left: 15px;">
+           ${savings}%
+        </span>
+    </div>
+`;
+
+
+
+
+
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Falha na compressão:', error);
+                    progressBar.style.width = '0%';
+                    card.querySelector('.compressed-size').textContent = 'Falha na compressão';
+                }
+            }
+
+            async removeMetadata(blob) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    img.onload = () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        canvas.toBlob((newBlob) => {
+                            if (newBlob) {
+                                resolve(newBlob);
+                            } else {
+                                reject(new Error('Falha ao remover metadados.'));
+                            }
+                        }, blob.type);
+                    };
+
+                    img.onerror = () => {
+                        reject(new Error('Falha ao carregar a imagem.'));
+                    };
+
+                    img.src = URL.createObjectURL(blob);
+                });
+            }
+
+            async resizeImage(blob, targetWidth, targetHeight) {
+                const img = new Image();
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                return new Promise((resolve) => {
+                    img.onload = () => {
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                        canvas.toBlob((resizedBlob) => {
+                            if (resizedBlob) resolve(resizedBlob);
+                        }, blob.type);
+                    };
+                    img.src = URL.createObjectURL(blob);
+                });
+            }
+
+            openCropModal(id) {
+                const modal = document.getElementById('cropModal');
+                const imageData = this.images.get(id);
+                const cropImage = document.getElementById('cropImage');
+                
+                cropImage.src = imageData.preview;
+                this.currentCropId = id;
+                
+                modal.classList.add('active');
+                
+                // Destruir qualquer instância anterior do Cropper
+                if (this.cropper) {
+                    this.cropper.destroy();
+                }
+                
+                // Inicializar o Cropper com as opções corretas
+                this.cropper = new Cropper(cropImage, {
+                    aspectRatio: NaN, // Aspect ratio livre inicialmente
+                    viewMode: 2,
+                    background: false,
+                    autoCropArea: 1,
+                    movable: true,
+                    zoomable: true,
+                    rotatable: false, // Desativado já que removemos a função
+                    scalable: false,   // Desativado já que removemos a função
+                    responsive: true,
+                    cropBoxResizable: true,
+                    ready: () => {
+                        // Ajustar o aspect ratio conforme o preset selecionado
+                        const activePreset = document.querySelector('.crop-preset-btn.active');
+                        const ratio = activePreset.dataset.ratio === 'free' ? NaN : parseFloat(activePreset.dataset.ratio);
+                        this.cropper.setAspectRatio(ratio);
+                    }
+                });
+            }
+async applyUpscale() {
+    if (!this.images.size) {
+        showToast('Nenhuma imagem disponível para upscale.');
+        return;
+    }
+
+    for (const [id, imageData] of this.images.entries()) {
+        try {
+            const img = new Image();
+            img.src = URL.createObjectURL(imageData.file);
+
+            await new Promise((resolve) => {
+                img.onload = resolve;
+            });
+
+            const upscaleFactor = 2; // Fator de upscale (2x)
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = img.width * upscaleFactor;
+            canvas.height = img.height * upscaleFactor;
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const upscaledBlob = await new Promise((resolve) => {
+                canvas.toBlob(resolve, `image/${imageData.format}`, 1);
+            });
+
+            if (upscaledBlob) {
+                imageData.file = new File([upscaledBlob], imageData.name + '.' + imageData.format, {
+                    type: `image/${imageData.format}`,
+                });
+                imageData.preview = URL.createObjectURL(upscaledBlob);
+
+                // Atualizar o card com a nova imagem
+                const card = document.querySelector(`[data-id="${id}"]`);
+                card.querySelector('.image-preview img').src = imageData.preview;
+
+                // Atualizar dimensões e recomprimir
+                await this.compressImage(id);
+            }
+        } catch (error) {
+            console.error('Falha ao fazer upscale:', error);
+        }
+    }
+
+    showToast('Upscale aplicado com sucesso!');
+}
+            closeCropModal() {
+                const modal = document.getElementById('cropModal');
+                modal.classList.remove('active');
+                if (this.cropper) {
+                    this.cropper.destroy();
+                    this.cropper = null;
+                }
+                this.currentCropId = null;
+            }
+
+            async applyCrop() {
+                if (!this.cropper || !this.currentCropId) return;
+
+                const imageData = this.images.get(this.currentCropId);
+                const canvas = this.cropper.getCroppedCanvas();
+                
+                if (!canvas) {
+                    showToast('Não foi possível recortar a imagem.');
+                    return;
+                }
+                
+                const blob = await new Promise((resolve) => {
+                    canvas.toBlob(resolve, `image/${imageData.format}`);
+                });
+
+                if (blob) {
+                    // Atualizar o arquivo e a visualização da imagem
+                    imageData.file = new File([blob], imageData.name + '.' + imageData.format, {
+                        type: `image/${imageData.format}`
+                    });
+                    imageData.preview = URL.createObjectURL(blob);
+                    
+                    const card = document.querySelector(`[data-id="${this.currentCropId}"]`);
+                    card.querySelector('.image-preview img').src = imageData.preview;
+                    
+                    await this.compressImage(this.currentCropId);
+                }
+
+                this.closeCropModal();
+            }
+
+            toggleImageSelection(id) {
+                const imageData = this.images.get(id);
+                const card = document.querySelector(`[data-id="${id}"]`);
+                
+                imageData.selected = !imageData.selected;
+                card.classList.toggle('selected', imageData.selected);
+            }
+
+            toggleSelectAll() {
+                const allSelected = Array.from(this.images.values()).every(img => img.selected);
+                
+                this.images.forEach((imageData, id) => {
+                    imageData.selected = !allSelected;
+                    const card = document.querySelector(`[data-id="${id}"]`);
+                    card.classList.toggle('selected', imageData.selected);
+                });
+            }
+
+            applyBatchFormat(format) {
+                this.images.forEach((imageData, id) => {
+                    if (imageData.selected) {
+                        imageData.format = format;
+                        const card = document.querySelector(`[data-id="${id}"]`);
+                        card.querySelector('.format-select').value = format;
+                        this.compressImage(id);
+                    }
+                });
+            }
+
+            applyBatchQuality(quality) {
+                this.images.forEach((imageData, id) => {
+                    if (imageData.selected) {
+                        imageData.quality = quality;
+                        const card = document.querySelector(`[data-id="${id}"]`);
+                        card.querySelector('.quality-input').value = quality;
+                        card.querySelector('.quality-value').textContent = quality + '%';
+                        this.compressImage(id);
+                    }
+                });
+            }
+
+            applyBatchSettings() {
+                const format = document.getElementById('batchFormat').value;
+                const quality = document.getElementById('batchQuality').value;
+
+                if (format) this.applyBatchFormat(format);
+                if (quality) this.applyBatchQuality(parseInt(quality));
+            }
+
+            filterImages(filter) {
+                const grid = document.getElementById('imagesGrid');
+                const cards = grid.querySelectorAll('.image-card');
+
+                cards.forEach(card => {
+                    const id = card.dataset.id;
+                    const imageData = this.images.get(id);
+                    let show = true;
+
+                    switch (filter) {
+                        case 'compressed':
+                            show = imageData.compressedSize < imageData.originalSize;
+                            break;
+                        case 'original':
+                            show = imageData.compressedSize >= imageData.originalSize;
+                            break;
+                        case 'image':
+                            show = imageData.file.type.startsWith('image/');
+                            break;
+                        case 'all':
+                        default:
+                            show = true;
+                            break;
+                    }
+
+                    card.style.display = show ? 'block' : 'none';
+                });
+            }
+
+            async downloadImage(id) {
+                const imageData = this.images.get(id);
+                const blob = imageData.compressedBlob;
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${imageData.name}.${imageData.format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            async downloadAllAsZip() {
+                const zip = new JSZip();
+                const selectedImages = Array.from(this.images.values()).filter(img => img.selected);
+                const imagesToZip = selectedImages.length > 0 ? selectedImages : Array.from(this.images.values());
+
+                for (const imageData of imagesToZip) {
+                    zip.file(
+                        `${imageData.name}.${imageData.format}`,
+                        imageData.compressedBlob
+                    );
+                }
+
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'imagens-comprimidas.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            removeImage(id) {
+                const card = document.querySelector(`[data-id="${id}"]`);
+                card.remove();
+                URL.revokeObjectURL(this.images.get(id).preview);
+                this.images.delete(id);
+                this.updateStats();
+                this.updateGlobalButtons();
+            }
+
+            clearAll() {
+                this.images.forEach((imageData) => {
+                    URL.revokeObjectURL(imageData.preview);
+                });
+                this.images.clear();
+                document.getElementById('imagesGrid').innerHTML = '';
+                this.updateStats();
+                this.updateGlobalButtons();
+                this.namingCount = 1; // Reset naming count
+            }
+
+            updateGlobalButtons() {
+                const downloadAllBtn = document.getElementById('downloadAllBtn');
+                const clearAllBtn = document.getElementById('clearAllBtn');
+                const hasImages = this.images.size > 0;
+                
+                downloadAllBtn.style.display = hasImages ? 'flex' : 'none';
+                clearAllBtn.style.display = hasImages ? 'flex' : 'none';
+            }
+
+            updateStats() {
+                let totalSaved = 0;
+                let totalCompression = 0;
+                
+                this.images.forEach(imageData => {
+                    if (imageData.compressedSize) {
+                        totalSaved += imageData.originalSize - imageData.compressedSize;
+                        totalCompression += ((imageData.originalSize - imageData.compressedSize) / imageData.originalSize) * 100;
+                    }
+                });
+
+                const averageCompression = this.images.size > 0 ? totalCompression / this.images.size : 0;
+
+                document.getElementById('totalImages').textContent = this.images.size;
+                document.getElementById('totalSaved').textContent = this.formatBytes(totalSaved);
+                document.getElementById('averageCompression').textContent = `${averageCompression.toFixed(1)}%`;
+            }
+
+            formatBytes(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        }
+document.getElementById('applyDimensions').addEventListener('click', () => {
+    const outputWidth = parseInt(document.getElementById('outputWidth').value, 10);
+    const outputHeight = parseInt(document.getElementById('outputHeight').value, 10);
+    const prefix = document.getElementById('namingPrefix').value.trim();
+
+    if (isNaN(outputWidth) || isNaN(outputHeight) || outputWidth <= 0 || outputHeight <= 0) {
+        showToast('Por favor, insira valores válidos para largura e altura!');
+        return;
+    }
+
+    // Atualiza as dimensões nas configurações de saída
+    imageCompressor.outputSize.width = outputWidth;
+    imageCompressor.outputSize.height = outputHeight;
+
+    // Atualiza o prefixo para todas as imagens e aplica as novas dimensões
+    imageCompressor.namingPrefix = prefix;
+    imageCompressor.namingCount = 1; // Reinicia o contador
+    imageCompressor.images.forEach((imageData, id) => {
+        // Atualiza o nome da imagem com o novo prefixo
+        const newName = prefix ? `${prefix}${imageCompressor.namingCount++}` : imageData.name;
+        imageData.name = newName;
+
+        // Atualiza o nome visível no input de nome do arquivo
+        const nameInput = document.querySelector(`#filename-${id}`);
+        if (nameInput) {
+            nameInput.value = newName;
+        }
+
+        // Reprocessa a imagem com as novas dimensões
+        imageCompressor.compressImage(id);
+    });
+
+    showToast(`Dimensões ${outputWidth}x${outputHeight} e prefixo "${prefix}" aplicados com sucesso!`);
+});
+
+
+        const imageCompressor = new ImageCompressor();
+        </script>
+<style id="allow-copy_style">html, body, *, *::before, *::after, html body *, #allow-copy_script ~ body * {
+  -webkit-user-select: initial !important; 
+  user-select: initial !important; 
+} </style>
